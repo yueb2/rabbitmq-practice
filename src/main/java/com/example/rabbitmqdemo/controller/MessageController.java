@@ -22,4 +22,10 @@ public class MessageController {
         rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, RabbitConfig.ROUTING_KEY, messageDto);
         return "메시지 전송 완료 : " + messageDto.getMessage();
     }
+
+    @PostMapping("/delay")
+    public String sendDelayMessage(@RequestBody MessageDto messageDto){
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, "delay.routingkey", messageDto);
+        return "지연 메시지 전송 완료 (10초 후 처리 예정)";
+    }
 }
