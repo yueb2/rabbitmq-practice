@@ -25,7 +25,13 @@ public class MessageController {
 
     @PostMapping("/delay")
     public String sendDelayMessage(@RequestBody MessageDto messageDto){
-        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, "delay.routingkey", messageDto);
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, "delay.routing.key", messageDto);
         return "지연 메시지 전송 완료 (10초 후 처리 예정)";
+    }
+
+    @PostMapping("/fail")
+    public String sendFailMessage(@RequestBody MessageDto messageDto){
+        rabbitTemplate.convertAndSend(RabbitConfig.EXCHANGE_NAME, "main.routing.key", messageDto);
+        return "실패 메시지 전송 시도";
     }
 }

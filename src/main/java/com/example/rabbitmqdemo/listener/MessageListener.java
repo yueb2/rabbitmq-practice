@@ -9,9 +9,18 @@ import org.springframework.stereotype.Component;
 @Slf4j // Lombok이 log라는 Logger 객체를 자동 생성
 @Component // 이 클래스는 Spring이 관리하는 Bean으로 등록됨
 public class MessageListener {
-    @RabbitListener(queues = RabbitConfig.QUEUE_NAME) //demo.queue로 부터 메시지가 오면 자동 호출된다.
+    @RabbitListener(queues = RabbitConfig.QUEUE_NAME) //main.queue로 부터 메시지가 오면 자동 호출된다.
     public void receiveMessage(MessageDto messageDto){
+        if(messageDto.getMessage().contains("fail")){ // fail이라는 단어가 포함되면 실패 처리.
+            log.info("예외 발생! DLQ로 이동");
+            throw new RuntimeException("강제 실패");
+        }
         log.info("수신자 : {}", messageDto.getName());
         log.info("수신한 메시지 : {}", messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = RabbitConfig.DLQ_QUEUE)
+    public void receiveDlq(MessageDto messageDto){
+        log.info("[DLQ 수신] 실패 메시지: {} ",  messageDto.getMessage());
     }
 }
