@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class MessageDto{
     private String name;
     private String message;
+    private int retryCount;
 }

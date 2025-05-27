@@ -55,7 +55,7 @@ public class RabbitConfig {
     // delay queue 바인딩
     @Bean
     public Binding dealyBinding(){
-        return  BindingBuilder.bind(delayQueue()).to(mainExchange()).with("delay.routing.key");
+        return  BindingBuilder.bind(delayQueue()).to(dlxExchange()).with("retry.routing.key"); //DLQ메시지는 여기로 간다.
     }
 
     // 실 queue 바인딩
