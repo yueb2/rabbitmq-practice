@@ -41,4 +41,24 @@ public class MessageListener {
         //retry.routing.key로 라우팅되게 DLX 설정된 곳으로 전송
         rabbitTemplate.convertAndSend(RabbitConfig.DLX_EXCHANGE_NAME, "retry.routing.key", messageDto);
     }
+
+    @RabbitListener(queues = RabbitConfig.FANOUT_QUEUE_A)
+    public void receiveFanoutA(MessageDto messageDto){
+        log.info("[A 큐] 수신 : {} ",  messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = RabbitConfig.FANOUT_QUEUE_B)
+    public void receiveFanoutB(MessageDto messageDto){
+        log.info("[B 큐] 수신 : {} ",  messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = RabbitConfig.USER_QUEUE)
+    public void receiveUserTopic(MessageDto messageDto){
+        log.info("[user.queue] 수신: {}", messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = RabbitConfig.ORDER_QUEUE)
+    public void receiveOrderTopic(MessageDto messageDto){
+        log.info("[order.queue] 수신: {}", messageDto.getMessage());
+    }
 }
