@@ -8,6 +8,8 @@ import org.springframework.amqp.rabbit.core.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Component;
 
+import java.nio.file.*;
+
 @Slf4j // Lombok이 log라는 Logger 객체를 자동 생성
 @Component // 이 클래스는 Spring이 관리하는 Bean으로 등록됨
 public class MessageListener {
@@ -23,6 +25,18 @@ public class MessageListener {
         }
         log.info("수신자 : {}", messageDto.getName());
         log.info("수신한 메시지 : {}", messageDto.getMessage());
+
+        try {
+            String logLine = String.format("수신자 : %s, 메시지 : %s%n", messageDto.getName(), messageDto.getMessage());
+            Files.write(
+                    Paths.get("messages.log"), //현재프로젝트 루트에 log파일 경로 지정.
+                    logLine.getBytes(),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.APPEND
+            );
+        }catch (Exception e){
+            log.error("파일 저장 실패", e);
+        }
     }
 
     @RabbitListener(queues = RabbitConfig.DLQ_QUEUE)
