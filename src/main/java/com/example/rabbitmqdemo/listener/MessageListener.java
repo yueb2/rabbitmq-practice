@@ -1,14 +1,16 @@
 package com.example.rabbitmqdemo.listener;
 
-import com.example.rabbitmqdemo.config.RabbitConfig;
-import com.example.rabbitmqdemo.dto.MessageDto;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import com.example.rabbitmqdemo.config.*;
+import com.example.rabbitmqdemo.dto.*;
+import com.example.rabbitmqdemo.entity.*;
+import com.example.rabbitmqdemo.repository.*;
+import lombok.extern.slf4j.*;
+import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.amqp.rabbit.core.*;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.*;
 
-import java.nio.file.*;
+import java.time.*;
 
 @Slf4j // Lombok이 log라는 Logger 객체를 자동 생성
 @Component // 이 클래스는 Spring이 관리하는 Bean으로 등록됨
@@ -16,6 +18,9 @@ public class MessageListener {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private MessageLogRepository messageLogRepository;
 
     @RabbitListener(queues = RabbitConfig.QUEUE_NAME) //main.queue로 부터 메시지가 오면 자동 호출된다.
     public void receiveMessage(MessageDto messageDto){
@@ -26,17 +31,30 @@ public class MessageListener {
         log.info("수신자 : {}", messageDto.getName());
         log.info("수신한 메시지 : {}", messageDto.getMessage());
 
+        //db에 log 저장
+        MessageLog logEntity = MessageLog.builder()
+                .name(messageDto.getName())
+                .message(messageDto.getMessage())
+                .receivedAt(LocalDateTime.now())
+                .build();
+
+        messageLogRepository.save(logEntity);
+
+        //log파일에 log저장
+        /*
         try {
-            String logLine = String.format("수신자 : %s, 메시지 : %s%n", messageDto.getName(), messageDto.getMessage());
+            String logLine = String.format("수신자 : %s, 메시지 : %s\n", messageDto.getName(), messageDto.getMessage());
             Files.write(
                     Paths.get("messages.log"), //현재프로젝트 루트에 log파일 경로 지정.
                     logLine.getBytes(),
                     StandardOpenOption.CREATE,
                     StandardOpenOption.APPEND
             );
+
         }catch (Exception e){
             log.error("파일 저장 실패", e);
         }
+        */
     }
 
     @RabbitListener(queues = RabbitConfig.DLQ_QUEUE)
