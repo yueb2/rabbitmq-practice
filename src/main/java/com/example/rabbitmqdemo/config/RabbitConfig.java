@@ -75,6 +75,24 @@ public class RabbitConfig {
         return new Queue(ORDER_QUEUE);
     }
 
+    // queue1 : color.red
+    @Bean
+    public Queue redQueue() {
+        return new Queue("topic.queue.red");
+    }
+
+    // queue2 : color.* (* : 단어하나 일치)
+    @Bean
+    public Queue colorAllQueue(){
+        return new Queue("topic.queue.color.all");
+    }
+
+    //queue3 : color.# (# : 0개이상 모든 단어 일치)
+    @Bean
+    public Queue colorDeepQueue(){
+        return new Queue("topic.queue.color.deep");
+    }
+
     // delay queue 바인딩
     @Bean
     public Binding dealyBinding(){
@@ -110,6 +128,21 @@ public class RabbitConfig {
     @Bean
     public Binding orderBinding() {
         return BindingBuilder.bind(orderQueue()).to(topicExchange()).with("order.#");
+    }
+
+    @Bean
+    public Binding redBinding() {
+        return BindingBuilder.bind(redQueue()).to(topicExchange()).with("color.red");
+    }
+
+    @Bean
+    public Binding colorAllBinding() {
+        return BindingBuilder.bind(colorAllQueue()).to(topicExchange()).with("color.*");
+    }
+
+    @Bean
+    public Binding colorDeepBinding() {
+        return BindingBuilder.bind(colorDeepQueue()).to(topicExchange()).with("color.#");
     }
 
     @Bean

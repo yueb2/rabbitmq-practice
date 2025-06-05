@@ -93,4 +93,19 @@ public class MessageListener {
     public void receiveOrderTopic(MessageDto messageDto){
         log.info("[order.queue] 수신: {}", messageDto.getMessage());
     }
+
+    @RabbitListener(queues = "topic.queue.red")
+    public void receiveRedTopic(MessageDto messageDto){
+        log.info("[topic.queue.red] 수신자: {}, 메시지: {}", messageDto.getName(), messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = "topic.queue.color.all")
+    public void receiveColorAllTopic(MessageDto messageDto){
+        log.info("[topic.queue.color.all] 수신자: {}, 메시지: {}", messageDto.getName(), messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = "topic.queue.color.deep")
+    public void receiveColorDeepTopic(MessageDto messageDto){
+        log.info("[topic.queue.color.deep] 수신자: {}, 메시지: {}", messageDto.getName(), messageDto.getMessage());
+    }
 }
