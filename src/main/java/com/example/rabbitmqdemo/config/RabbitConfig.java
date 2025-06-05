@@ -24,6 +24,7 @@ public class RabbitConfig {
     public static final String TOPIC_EXCHANGE_NAME = "topic.exchange";
     public static final String USER_QUEUE = "topic.user.queue";
     public static final String ORDER_QUEUE = "topic.order.queue";
+    public static final String HEADER_EXCHANGE_NAME = "header.exchange";
 
     // delay queue : TTL + DLX 설정 포함
     @Bean
@@ -93,6 +94,16 @@ public class RabbitConfig {
         return new Queue("topic.queue.color.deep");
     }
 
+    @Bean
+    public Queue alertQueue(){
+        return QueueBuilder.nonDurable("alert.queue").build();
+    }
+
+    @Bean
+    public Queue logQueue(){
+        return QueueBuilder.nonDurable("log.queue").build();
+    }
+
     // delay queue 바인딩
     @Bean
     public Binding dealyBinding(){
@@ -145,6 +156,18 @@ public class RabbitConfig {
         return BindingBuilder.bind(colorDeepQueue()).to(topicExchange()).with("color.#");
     }
 
+    // header조건이 type=alert일때 alert queue바인딩
+    @Bean
+    public Binding alertBinding() {
+        return BindingBuilder.bind(alertQueue()).to(headerExchange()).where("type").matches(("alert"));
+    }
+
+    // header조건이 type=log일때 log queue바인딩
+    @Bean
+    public Binding logBinding() {
+        return BindingBuilder.bind(logQueue()).to(headerExchange()).where("type").matches(("log"));
+    }
+    
     @Bean
     public DirectExchange mainExchange(){
         return new DirectExchange(EXCHANGE_NAME); // 라우팅 키를 기준으로 메시지를 정확하게 라우팅 하는 방식의 교환기(exchange)
@@ -164,6 +187,11 @@ public class RabbitConfig {
     @Bean
     public TopicExchange topicExchange() {
         return new TopicExchange(TOPIC_EXCHANGE_NAME);
+    }
+
+    @Bean
+    public HeadersExchange headerExchange() {
+        return new HeadersExchange(HEADER_EXCHANGE_NAME);
     }
 
     @Bean

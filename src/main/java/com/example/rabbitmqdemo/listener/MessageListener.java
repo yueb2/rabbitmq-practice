@@ -108,4 +108,14 @@ public class MessageListener {
     public void receiveColorDeepTopic(MessageDto messageDto){
         log.info("[topic.queue.color.deep] 수신자: {}, 메시지: {}", messageDto.getName(), messageDto.getMessage());
     }
+
+    @RabbitListener(queues = "alert.queue")
+    public void receiveAlertQueue(MessageDto messageDto){
+        log.info("[alert.queue] 수신자: {}, 메시지: {}", messageDto.getName(), messageDto.getMessage());
+    }
+
+    @RabbitListener(queues = "log.queue")
+    public void receiveLogQueue(MessageDto messageDto){
+        log.info("[log.queue] 수신자: {}, 메시지: {}", messageDto.getName(), messageDto.getMessage());
+    }
 }

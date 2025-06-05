@@ -1,8 +1,10 @@
 package com.example.rabbitmqdemo.controller;
 
-import com.example.rabbitmqdemo.config.RabbitConfig;
-import com.example.rabbitmqdemo.dto.MessageDto;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import com.example.rabbitmqdemo.config.*;
+import com.example.rabbitmqdemo.dto.*;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.*;
+import org.springframework.amqp.support.converter.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController // 이 클래스는 RESTful 웹 서비스의 컨트롤러 이다.
@@ -43,5 +45,16 @@ public class MessageController {
     public String sendTopic(@RequestParam String routingKey, @RequestBody MessageDto messageDto){
         rabbitTemplate.convertAndSend(RabbitConfig.TOPIC_EXCHANGE_NAME, routingKey, messageDto);
         return "토픽 메세지 전송 완료 ("+routingKey+")";
+    }
+
+    @PostMapping("/header")
+    public String sendHeader(@RequestBody MessageDto messageDto, @RequestHeader("type") String type){
+        MessageProperties props = new MessageProperties();
+        props.setHeader("type", type);
+        MessageConverter converter = new Jackson2JsonMessageConverter();
+        Message message = converter.toMessage(messageDto, props);
+
+        rabbitTemplate.send("header.exchange", "", message);
+        return "헤더기반 메시지 전송 완료!";
     }
 }
